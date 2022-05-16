@@ -39,57 +39,59 @@ conn.commit()
 conn.close()
 
 def hashImage(filepath):
-    with open(filepath,"rb") as f:
-        bytes = f.read() # read entire file as bytes
-        imageHash = hashlib.sha256(bytes).hexdigest()
-        return (f'{imageHash}.jpg')
+    try:    
+        with open(filepath,"rb") as f:
+            bytes = f.read() # read entire file as bytes
+            imageHash = hashlib.sha256(bytes).hexdigest()
+            return (f'{imageHash}.jpg')
+    except sqlite3.Error as error:
+        return error
 
 def addItem(name, category, image):
-    conn = sqlite3.connect('mercari.sqlite3')
-    c = conn.cursor()
-    c.execute("INSERT INTO items(name, category, image) VALUES (?,?,?)", (name, category, hashImage(image)))
-    conn.commit()
-    conn.close()
-    print("Item added successfully.")
+    try:
+        conn = sqlite3.connect('mercari.sqlite3')
+        c = conn.cursor()
+        c.execute("INSERT INTO items(name, category, image) VALUES (?,?,?)", (name, category, hashImage(image)))
+        conn.commit()
+        conn.close()
+        print("Item added successfully.")
+    except sqlite3.Error as error:
+        return error
 
 def getAllItems():
-    conn = sqlite3.connect('mercari.sqlite3')
-    c = conn.cursor()
-    c.execute("SELECT name, category, image FROM items")
-    itemLists = c.fetchall()
-    result = []
-    for itemList in itemLists:
-        result.append({ "name": itemList[0], "category": itemList[1], "image": itemList[2]})
-    return result
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect('mercari.sqlite3')
+        c = conn.cursor()
+        c.execute("SELECT name, category, image FROM items")
+        itemLists = c.fetchall()
+        result = []
+        for itemList in itemLists:
+            result.append({ "name": itemList[0], "category": itemList[1], "image": itemList[2]})
+        return result
+        conn.commit()
+        conn.close()
+    except sqlite3.Error as error:
+        return error
 
 def getSpecificItems(**args):
-    conn = sqlite3.connect('mercari.sqlite3')
-    c = conn.cursor()
-    if 'name' in args: c.execute("SELECT name, category, image FROM items WHERE name = ?", (args['name'].lower(),))
-    if 'id' in args: c.execute("SELECT name, category, image FROM items WHERE id = ?", (args['id'],))
-    itemLists = c.fetchall()
-    result = []
-    for itemList in itemLists:
-        result.append({ "name": itemList[0], "category": itemList[1], "image": itemList[2]})
-    return result
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect('mercari.sqlite3')
+        c = conn.cursor()
+        if 'name' in args: c.execute("SELECT name, category, image FROM items WHERE name = ?", (args['name'].lower(),))
+        if 'id' in args: c.execute("SELECT name, category, image FROM items WHERE id = ?", (args['id'],))
+        itemLists = c.fetchall()
+        result = []
+        for itemList in itemLists:
+            result.append({ "name": itemList[0], "category": itemList[1], "image": itemList[2]})
+        return result
+        conn.commit()
+        conn.close()
+    except sqlite3.Error as error:
+        return error
 
 @app.get("/")
 def root():
     return {"message": "Hello, world!"}
-
-#data = []
-#data1 = {"items": data}
-#@app.post("/items")
-#def add_item(name: str = Form(...), category: str = Form(...)):
-#    data.append({"name": name, "category": category})
-#    with open('items.json', 'w') as json_file:
-#        json.dump(data1, json_file)
-#    logger.info(f"Receive item: {name}")
-#    return {"message": f"item received: {name}"}
 
 @app.post("/items")
 def add_item(name: str = Form(...), category: str = Form(...), image: str = Form(...)):
@@ -97,11 +99,6 @@ def add_item(name: str = Form(...), category: str = Form(...), image: str = Form
     inputDetail = {"name": name, "category": category, "image": image}
     logger.info(f"Receive item: {inputDetail}")
     return {"message": f"item received: {name}"}
-
-#@app.get("/items")
-#def getItems():
-#    data = open('items.json')
-#    return json.load(data)
 
 @app.get("/items")
 def getItems():
