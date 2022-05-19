@@ -1,0 +1,4 @@
+#database
+mercari.sqlite3
+
+__pycache__/
