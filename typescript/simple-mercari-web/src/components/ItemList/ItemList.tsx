@@ -46,17 +46,20 @@ export const ItemList: React.FC<Prop> = (props) => {
   }, [reload]);
 
   return (
-    <div>
+    <div className="ItemListGrid">
       {items.map((item) => {
         return (
           <div key={item.id} className='ItemList'>
             {/* TODO: Task 1: Replace the placeholder image with the item image */}
-            <img src={placeholderImage} />
-            <p>
-              <span>Name: {item.name}</span>
-              <br />
-              <span>Category: {item.category}</span>
-            </p>
+            <div className="Item">
+              <img className='ItemImage' src={server.concat(`/image/${item.image_filename}`)} alt={item.name} />
+              <p className='ItemInfo'>
+                <span className='ItemContent'>Name: </span>
+                <br />
+                <div className='ItemName'>{item.name}</div>
+                <span className='ItemContent'>Category: {item.category}</span>
+              </p>
+            </div>
           </div>
         )
       })}
