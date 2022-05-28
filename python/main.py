@@ -81,7 +81,6 @@ def getAllItems():
     try:
         conn = sqlite3.connect('mercari.sqlite3')
         c = conn.cursor()
-        #c.execute("SELECT name, category, image_filename FROM items")
         c.execute("""SELECT items.name,
         category.name as category,
         items.image_filename
